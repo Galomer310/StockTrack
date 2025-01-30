@@ -15,7 +15,7 @@ const Login = () => {
     const userData = { email, password };
 
     try {
-      const response = await fetch("http://localhost:3000/api/login", {
+      const response = await fetch("http://localhost:3000/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userData),
@@ -30,16 +30,21 @@ const Login = () => {
       const data = await response.json();
       console.log("Login successful:", data);
 
-      // Store user data and access token in Redux
-      dispatch(
-        setUser({
-          user: { id: data.user.id, email: data.user.email },
-          accessToken: data.accessToken,
-        })
-      );
+      // ✅ Ensure user object exists in response
+      if (data.accessToken && data.user) {
+        // Store user data in Redux
+        dispatch(
+          setUser({
+            user: { id: data.user.id, email: data.user.email },
+            accessToken: data.accessToken,
+          })
+        );
 
-      // Redirect to the user page after successful login
-      navigate("/user");
+        // Navigate to user page
+        navigate("/user");
+      } else {
+        alert("Login response did not contain expected data.");
+      }
     } catch (error) {
       alert("Error during login: " + (error as Error).message);
     }
