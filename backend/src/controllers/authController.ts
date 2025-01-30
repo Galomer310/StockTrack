@@ -38,7 +38,16 @@ export const login = async (req: TypedRequest<LoginRequestBody>, res: Response) 
     if (!isPasswordValid) return res.status(401).json({ error: "Invalid credentials" });
 
     const accessToken = generateAccessToken(user.id);
-    return res.json({ message: "Login successful", accessToken });
+
+    // ✅ Ensure the response has a `user` object
+    return res.json({
+      message: "Login successful",
+      accessToken,
+      user: {
+        id: user.id,
+        email: user.email,
+      },
+    });
   } catch (error) {
     console.error("Error:", error);
     return res.status(500).json({ error: "Server error" });
