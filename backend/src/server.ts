@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes";
 import stockRoutes from "./routes/stockRoutes";
+import watchlistRoutes from "./routes/watchlistRoutes";
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ app.use(cookieParser());
 // Routes
 app.use("/auth", authRoutes);
 app.use("/stocks", stockRoutes);
+app.use("/watchlist", watchlistRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
