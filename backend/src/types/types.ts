@@ -21,3 +21,12 @@ export interface TypedRequest<T> extends Request {
 export interface JwtPayload {
   userId: number;
 }
+
+export interface User {
+  id: number;
+  email: string;
+}
+
+export interface AuthRequest extends Request {
+  user?: User;
+}
