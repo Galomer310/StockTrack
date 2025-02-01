@@ -1,12 +1,11 @@
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { RootState } from "../store"; // Import RootState to access Redux state
+import { RootState } from "../store";
 
 const UserPage = () => {
-  const user = useSelector((state: RootState) => state.auth.user); // Get user from Redux store
+  const user = useSelector((state: RootState) => state.auth.user);
   const navigate = useNavigate();
 
-  // If there is no user (meaning the user is not logged in), redirect to the login page
   if (!user) {
     navigate("/login");
   }
@@ -18,6 +17,8 @@ const UserPage = () => {
           <h1>Welcome, {user.email}</h1>
           <p>You are logged in!</p>
           <button onClick={() => navigate("/")}>Back to Home</button>
+          <button onClick={() => navigate("/search")}>Search Stocks</button>
+          <button onClick={() => navigate("/watchlist")}>View Watchlist</button>
         </div>
       ) : (
         <p>Loading...</p>

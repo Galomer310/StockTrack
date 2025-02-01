@@ -3,21 +3,29 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import { RootState } from "../store";
 
+const POLYGON_API_KEY = import.meta.env.VITE_POLYGON_API_KEY; // Load from frontend .env file
+
 const StockSearch: React.FC = () => {
   const [query, setQuery] = useState("");
   const [stockData, setStockData] = useState<any>(null);
   const [error, setError] = useState("");
   const user = useSelector((state: RootState) => state.auth.user);
+  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
 
   const searchStock = async () => {
     try {
       const res = await axios.get(
-        `https://api.polygon.io/v3/reference/tickers/${query}?apiKey=YOUR_POLYGON_API_KEY`
+        `https://api.polygon.io/v2/aggs/ticker/${query}/prev?adjusted=true&apiKey=${POLYGON_API_KEY}`
       );
-      setStockData(res.data);
-      setError("");
+      if (res.data.results && res.data.results.length > 0) {
+        setStockData(res.data.results[0]); // Get the first result
+        setError("");
+      } else {
+        setError("No data available for this stock.");
+        setStockData(null);
+      }
     } catch (err) {
-      setError("Stock not found");
+      setError("Stock not found or API error.");
       setStockData(null);
     }
   };
@@ -27,14 +35,15 @@ const StockSearch: React.FC = () => {
       setError("You must be logged in to add to watchlist");
       return;
     }
-
     try {
       await axios.post(
         "http://localhost:3000/watchlist",
-        { ticker: stockData.ticker, userId: user.id },
-        { withCredentials: true }
+        { ticker: query, userId: user.id },
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
       );
-      alert(`${stockData.ticker} added to watchlist`);
+      alert(`${query} added to watchlist`);
     } catch (err) {
       setError("Failed to add to watchlist");
     }
@@ -50,15 +59,13 @@ const StockSearch: React.FC = () => {
         onChange={(e) => setQuery(e.target.value.toUpperCase())}
       />
       <button onClick={searchStock}>Search</button>
-
       {error && <p className="error">{error}</p>}
-
       {stockData && (
         <div className="stock-info">
           <h3>
-            {stockData.name} ({stockData.ticker})
+            {query} - Closing Price: ${stockData.c}
           </h3>
-          <p>Market: {stockData.market}</p>
+          <p>Volume: {stockData.v}</p>
           <button onClick={addToWatchlist} disabled={!user}>
             Add to Watchlist
           </button>

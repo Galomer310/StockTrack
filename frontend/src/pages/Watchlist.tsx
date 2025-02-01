@@ -1,13 +1,26 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
+import { useNavigate } from "react-router-dom";
 
 const Watchlist = () => {
   const [watchlist, setWatchlist] = useState<any[]>([]);
+  const user = useSelector((state: RootState) => state.auth.user);
+  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
     const fetchWatchlist = async () => {
       try {
-        const response = await axios.get("/watchlist");
+        const response = await axios.get("http://localhost:3000/watchlist", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
         setWatchlist(response.data);
       } catch (err) {
         console.error("Error fetching watchlist:", err);
@@ -15,11 +28,13 @@ const Watchlist = () => {
     };
 
     fetchWatchlist();
-  }, []);
+  }, [user, navigate, accessToken]);
 
   const handleRemoveFromWatchlist = async (ticker: string) => {
     try {
-      await axios.delete(`/watchlist/${ticker}`);
+      await axios.delete(`http://localhost:3000/watchlist/${ticker}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
       setWatchlist(watchlist.filter((stock) => stock.stock_symbol !== ticker));
       alert(`Stock ${ticker} removed from watchlist`);
     } catch (err) {
