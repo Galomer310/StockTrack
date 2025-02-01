@@ -1,15 +1,12 @@
 import express from "express";
 import { getWatchlist, addToWatchlist, removeFromWatchlist } from "../controllers/watchlistController";
+import { authenticateUser } from "../middleware/authMiddleware";
 
 const router = express.Router();
 
-//  Fetch user's watchlist
-router.get("/", getWatchlist);
-
-//  Add a stock to the watchlist
-router.post("/", addToWatchlist);
-
-//  Remove a stock from the watchlist
-router.delete("/:ticker", removeFromWatchlist);
+// ✅ Middleware correctly passes to the next function
+router.get("/", authenticateUser, getWatchlist);
+router.post("/", authenticateUser, addToWatchlist);
+router.delete("/:ticker", authenticateUser, removeFromWatchlist);
 
 export default router;

@@ -2,38 +2,40 @@ import { Request, Response, NextFunction, RequestHandler } from "express";
 import pool from "../config/db";
 
 // 📌 Get all watchlist stocks for a user
-export const getWatchlist = async (req: Request, res: Response, next: NextFunction) => {
+export const getWatchlist: RequestHandler = async (req, res, next) => {
     try {
-        const result = await pool.query("SELECT * FROM watchlist");
+        const userId = (req as any).user.id; // Extract user ID from request
+        const result = await pool.query("SELECT * FROM watchlist WHERE user_id = $1", [userId]);
         res.json(result.rows);
     } catch (error) {
         console.error("Error fetching watchlist:", error);
-        next(error); // Call next() if there's an error
+        next(error);
     }
 };
 
 // 📌 Add a stock to the watchlist
-export const addToWatchlist: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const { stock_symbol, userId } = req.body;
+export const addToWatchlist: RequestHandler = async (req, res, next): Promise<void> => {
+    const { stock_symbol } = req.body;
+    const userId = (req as any).user.id; // Extract authenticated user ID
 
-    if (!stock_symbol || !userId) {
-        res.status(400).json({ error: "Stock symbol and userId are required" });
+    if (!stock_symbol) {
+        res.status(400).json({ error: "Stock symbol is required" });
         return;
     }
 
     try {
         await pool.query("INSERT INTO watchlist (user_id, stock_symbol) VALUES ($1, $2)", [userId, stock_symbol]);
         res.json({ message: `Stock ${stock_symbol} added to watchlist` });
-        return;
     } catch (error) {
         console.error("Error adding to watchlist:", error);
-        next(error); // Call next() if there's an error
+        next(error);
     }
 };
 
 // 📌 Remove a stock from the watchlist
-export const removeFromWatchlist: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
-    const { ticker } = req.params;  // Make sure to use 'ticker' as per the route
+export const removeFromWatchlist: RequestHandler = async (req, res, next): Promise<void> => {
+    const { ticker } = req.params;
+    const userId = (req as any).user.id; // Extract authenticated user ID
 
     if (!ticker) {
         res.status(400).json({ error: "Stock symbol is required" });
@@ -41,8 +43,7 @@ export const removeFromWatchlist: RequestHandler = async (req: Request, res: Res
     }
 
     try {
-        // Remove the stock from the watchlist
-        const result = await pool.query("DELETE FROM watchlist WHERE stock_symbol = $1", [ticker]);
+        const result = await pool.query("DELETE FROM watchlist WHERE user_id = $1 AND stock_symbol = $2", [userId, ticker]);
 
         if (result.rowCount === 0) {
             res.status(404).json({ error: `Stock ${ticker} not found in watchlist` });
@@ -52,6 +53,6 @@ export const removeFromWatchlist: RequestHandler = async (req: Request, res: Res
         res.json({ message: `Stock ${ticker} removed from watchlist` });
     } catch (error) {
         console.error("Error removing from watchlist:", error);
-        next(error); // Call next() if there's an error
+        next(error);
     }
 };
