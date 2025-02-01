@@ -38,7 +38,7 @@ const StockSearch: React.FC = () => {
     try {
       await axios.post(
         "http://localhost:3000/watchlist",
-        { ticker: query, userId: user.id },
+        { stock_symbol: query, userId: user.id },
         {
           headers: { Authorization: `Bearer ${accessToken}` },
         }

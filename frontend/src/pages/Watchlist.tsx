@@ -22,23 +22,32 @@ const Watchlist = () => {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         setWatchlist(response.data);
-      } catch (err) {
-        console.error("Error fetching watchlist:", err);
+      } catch (err: any) {
+        console.error(
+          "Error fetching watchlist:",
+          err.response?.data || err.message
+        );
       }
     };
 
     fetchWatchlist();
   }, [user, navigate, accessToken]);
 
-  const handleRemoveFromWatchlist = async (ticker: string) => {
+  const handleRemoveFromWatchlist = async (stock_symbol: string) => {
     try {
-      await axios.delete(`http://localhost:3000/watchlist/${ticker}`, {
+      await axios.delete(`http://localhost:3000/watchlist/${stock_symbol}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
-      setWatchlist(watchlist.filter((stock) => stock.stock_symbol !== ticker));
-      alert(`Stock ${ticker} removed from watchlist`);
-    } catch (err) {
-      console.error("Error removing from watchlist:", err);
+
+      // Ensure the watchlist state uses `ticker` instead of `stock_symbol`
+      setWatchlist(watchlist.filter((stock) => stock.ticker !== stock_symbol));
+
+      alert(`Stock ${stock_symbol} removed from watchlist`);
+    } catch (err: any) {
+      console.error(
+        "Error removing from watchlist:",
+        err.response?.data || err.message
+      );
     }
   };
 
