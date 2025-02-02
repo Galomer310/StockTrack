@@ -70,6 +70,9 @@ const Watchlist = () => {
           ))}
         </ul>
       )}
+      <button onClick={() => navigate("/")}>Log Out</button>
+      <button onClick={() => navigate("/user")}>User dashboard</button>
+      <button onClick={() => navigate("/search")}>Search Stocks</button>
     </div>
   );
 };

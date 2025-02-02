@@ -6,11 +6,12 @@ import {
 } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "./store";
+import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import UserPage from "./pages/UserPage";
-import Home from "./pages/Home";
 import StockSearch from "./pages/StockSearch";
+import StockDetails from "./pages/StockDetails";
 import Watchlist from "./pages/Watchlist";
 
 const App = () => {
@@ -33,6 +34,10 @@ const App = () => {
         <Route
           path="/watchlist"
           element={user ? <Watchlist /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/stock/:ticker"
+          element={user ? <StockDetails /> : <Navigate to="/login" />}
         />
       </Routes>
     </Router>

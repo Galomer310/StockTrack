@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { RootState } from "../store";
+import { useNavigate } from "react-router-dom";
 
 const POLYGON_API_KEY = import.meta.env.VITE_POLYGON_API_KEY; // Load API key from .env
 
@@ -11,6 +12,8 @@ const StockSearch: React.FC = () => {
   const [companyInfo, setCompanyInfo] = useState<any>(null);
   const [marketStatus, setMarketStatus] = useState<string | null>(null);
   const [error, setError] = useState("");
+
+  const navigate = useNavigate();
 
   const user = useSelector((state: RootState) => state.auth.user);
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
@@ -107,11 +110,12 @@ const StockSearch: React.FC = () => {
         <div className="company-info">
           {companyInfo.branding?.logo_url && (
             <img
-              src={companyInfo.branding.logo_url}
+              src={`${companyInfo.branding.logo_url}?format=png`} // Append ?format=png
               alt={`${companyInfo.name} Logo`}
-              style={{ width: "100px" }}
+              style={{ width: "100px", height: "100px", objectFit: "contain" }}
             />
           )}
+
           <h3>{companyInfo.name}</h3>
           <p>Industry: {companyInfo.sic_description}</p>
         </div>
@@ -129,6 +133,9 @@ const StockSearch: React.FC = () => {
           </button>
         </div>
       )}
+      <button onClick={() => navigate("/")}>Log Out</button>
+      <button onClick={() => navigate("/user")}>User dashboard</button>
+      <button onClick={() => navigate("/watchlist")}>View Watchlist</button>
     </div>
   );
 };
