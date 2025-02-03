@@ -1,9 +1,10 @@
+// frontend/src/pages/Watchlist.tsx
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
 import { useNavigate } from "react-router-dom";
-import StockDistributionPieChart from "../components/StockDistributionPieChart";
+import StockDistributionPieChart from "../components/StockDistributionPieChart"; // renamed pie chart component
 
 const Watchlist = () => {
   const [watchlist, setWatchlist] = useState<any[]>([]);
@@ -59,7 +60,6 @@ const Watchlist = () => {
   // Enter edit mode for a specific item
   const handleEdit = (item: any) => {
     setEditingItemId(item.id);
-    // Initialize edit fields with the current data
     setEditingItemData({
       quantity: item.quantity,
       price_at_time: item.price_at_time,
@@ -81,7 +81,6 @@ const Watchlist = () => {
           headers: { Authorization: `Bearer ${accessToken}` },
         }
       );
-      // Update local state with the edited data
       const updatedWatchlist = watchlist.map((item) =>
         item.id === id ? { ...item, ...editingItemData } : item
       );
@@ -115,15 +114,6 @@ const Watchlist = () => {
 
       {/* Watchlist Container */}
       <div className="watchlist">
-        {/* Header Row */}
-        <div className="watchlist-header">
-          <div className="ticker">Ticker</div>
-          <div className="price">Price</div>
-          <div className="quantity">Qty</div>
-          <div className="added">Added</div>
-          <div className="actions">Actions</div>
-        </div>
-
         {/* Data Rows */}
         {watchlist.map((stock) => (
           <div
@@ -134,7 +124,18 @@ const Watchlist = () => {
           >
             <div className="ticker">{stock.stock_symbol}</div>
             <div className="price">
-              ${parseFloat(stock.price_at_time).toFixed(2)}
+              {editingItemId === stock.id ? (
+                <input
+                  type="number"
+                  name="price_at_time"
+                  value={editingItemData.price_at_time}
+                  onChange={handleEditChange}
+                  step="0.01"
+                  required
+                />
+              ) : (
+                `$${parseFloat(stock.price_at_time).toFixed(2)}`
+              )}
             </div>
             <div className="quantity">
               {editingItemId === stock.id ? (
@@ -144,6 +145,7 @@ const Watchlist = () => {
                   value={editingItemData.quantity}
                   onChange={handleEditChange}
                   min="1"
+                  required
                 />
               ) : (
                 stock.quantity
@@ -184,6 +186,9 @@ const Watchlist = () => {
 
       <button onClick={() => navigate("/")}>Log Out</button>
       <button onClick={() => navigate("/search")}>Search Stocks</button>
+      <button onClick={() => navigate("/manual-add")}>
+        Add Stock Manually
+      </button>
     </div>
   );
 };

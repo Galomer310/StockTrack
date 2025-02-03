@@ -21,31 +21,131 @@
     margin: 0 auto;
     padding: 20px;
   }
+
   
+
+/* frontend/src/components/Navbar.css */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #007bff;
+  padding: 10px 20px;
+  color: #fff;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.navbar-links {
+  list-style: none;
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-links li {
+  margin-left: 20px;
+}
+
+.navbar-links li a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1rem;
+}
+
+.navbar-links li a:hover {
+  text-decoration: underline;
+}
+
+
+
+
   /* ---------- Home Page ---------- */
-  .home-container {
-    text-align: center;
-    margin-top: 50px;
-  }
-  
-  .home-container h1 {
+/* Home.css */
+
+
+
+
+
+/* Ensure the container fills the entire viewport */
+.home-container {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Hero section styling */
+.hero {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Full-screen background image */
+.hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.7); /* Darken the image slightly for better text contrast */
+}
+
+/* Overlay for text and buttons */
+.hero-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #c96d6d;
+  padding: 0 20px;
+}
+
+/* Main heading style */
+.hero-overlay h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+/* Paragraph style */
+.hero-overlay p {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Button container and individual button styling */
+.hero-buttons .btn {
+  background-color: #007bff;
+  padding: 0.75rem 1.5rem;
+  margin: 0 0.5rem;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+  font-size: 1rem;
+}
+
+.hero-buttons .btn:hover {
+  background-color: #0056b3;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hero-overlay h1 {
     font-size: 2.5rem;
-    margin-bottom: 20px;
   }
-  
-  .home-container a {
-    text-decoration: none;
-    color: #fff;
-    background-color: #007bff;
-    padding: 10px 20px;
-    margin: 10px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
+  .hero-overlay p {
+    font-size: 1.2rem;
   }
-  
-  .home-container a:hover {
-    background-color: #0056b3;
+  .hero-buttons .btn {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
   }
+}
+
   
   /* ---------- Authentication (Login & Register) ---------- */
   .login-container,

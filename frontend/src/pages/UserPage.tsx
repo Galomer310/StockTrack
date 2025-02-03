@@ -16,8 +16,11 @@ const UserPage = () => {
     <div className="user-page-container">
       {user ? (
         <div>
-          <h1>Welcome, {user.email}</h1>
-          <p>You are logged in!</p>
+          {/* Descriptive Text for the User Dashboard */}
+          <section className="dashboard-info">
+            <h1>My Investment Dashboard</h1>
+          </section>
+
           <Watchlist />
         </div>
       ) : (

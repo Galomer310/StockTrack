@@ -1,7 +1,8 @@
+// frontend/src/App.tsx
 import {
   BrowserRouter as Router,
-  Route,
   Routes,
+  Route,
   Navigate,
 } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -11,14 +12,14 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import UserPage from "./pages/UserPage";
 import StockSearch from "./pages/StockSearch";
-import StockDetails from "./pages/StockDetails";
-import Watchlist from "./pages/Watchlist";
+import ManualAddStock from "./pages/ManualAddStock";
+import Navbar from "./components/Navbar";
 
 const App = () => {
   const user = useSelector((state: RootState) => state.auth.user);
-
   return (
     <Router>
+      <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
@@ -32,12 +33,8 @@ const App = () => {
           element={user ? <StockSearch /> : <Navigate to="/login" />}
         />
         <Route
-          path="/watchlist"
-          element={user ? <Watchlist /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/stock/:ticker"
-          element={user ? <StockDetails /> : <Navigate to="/login" />}
+          path="/manual-add"
+          element={user ? <ManualAddStock /> : <Navigate to="/login" />}
         />
       </Routes>
     </Router>

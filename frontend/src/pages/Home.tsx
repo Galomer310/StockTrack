@@ -1,12 +1,26 @@
 import { Link } from "react-router-dom";
+import "../style.css"; // Import the CSS file for styling
 
 const Home = () => {
   return (
     <div className="home-container">
-      <h1>Welcome to the Home Page!</h1>
-      <Link to="/login">Go to Login</Link>
-      <br />
-      <Link to="/register">Go to Register</Link>
+      <div className="hero">
+        <div className="hero-overlay">
+          <h1>Welcome to Investment Hub</h1>
+          <p>
+            Manage your portfolio, track your investments, and stay informed
+            about the market.
+          </p>
+          <div className="hero-buttons">
+            <Link to="/login" className="btn">
+              Login
+            </Link>
+            <Link to="/register" className="btn">
+              Register
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
