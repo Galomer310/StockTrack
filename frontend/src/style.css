@@ -214,6 +214,7 @@
   }
   
   .stock-search button {
+    margin: 5px;
     padding: 10px 20px;
     background: #28a745;
     border: none;
@@ -381,7 +382,7 @@
   }
   
   .watchlist button:hover {
-    background: #e0a800;
+    background: #e78127;
   }
 
   /* Styles for each row in the watchlist */
@@ -445,6 +446,11 @@
   
   /* ---------- Global Button Styles ---------- */
   button {
+    padding: 10px 20px;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
     cursor: pointer;
   }
   

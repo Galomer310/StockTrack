@@ -107,8 +107,7 @@ const Watchlist = () => {
 
   return (
     <div>
-      <h3>Your Watchlist</h3>
-      <h4>Total Portfolio Value: ${total.toFixed(2)}</h4>
+      <h4>Total Portfolio Contribution Value: ${total.toFixed(2)}</h4>
 
       <StockDistributionPieChart watchlist={watchlist} />
 
@@ -184,8 +183,6 @@ const Watchlist = () => {
         ))}
       </div>
 
-      <button onClick={() => navigate("/")}>Log Out</button>
-      <button onClick={() => navigate("/search")}>Search Stocks</button>
       <button onClick={() => navigate("/manual-add")}>
         Add Stock Manually
       </button>
