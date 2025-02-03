@@ -1,3 +1,4 @@
+// Frontend/src/pages/Watchlist.tsx
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
@@ -6,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 const Watchlist = () => {
   const [watchlist, setWatchlist] = useState<any[]>([]);
+  const [total, setTotal] = useState<number>(0);
   const user = useSelector((state: RootState) => state.auth.user);
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
   const navigate = useNavigate();
@@ -15,13 +17,14 @@ const Watchlist = () => {
       navigate("/login");
       return;
     }
-
     const fetchWatchlist = async () => {
       try {
         const response = await axios.get("http://localhost:3000/watchlist", {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
-        setWatchlist(response.data);
+        // Backend now returns an object: { total, watchlist }
+        setWatchlist(response.data.watchlist);
+        setTotal(response.data.total);
       } catch (err: any) {
         console.error(
           "Error fetching watchlist:",
@@ -29,7 +32,6 @@ const Watchlist = () => {
         );
       }
     };
-
     fetchWatchlist();
   }, [user, navigate, accessToken]);
 
@@ -38,10 +40,10 @@ const Watchlist = () => {
       await axios.delete(`http://localhost:3000/watchlist/${stock_symbol}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
-
-      // Ensure the watchlist state uses `ticker` instead of `stock_symbol`
-      setWatchlist(watchlist.filter((stock) => stock.ticker !== stock_symbol));
-
+      // Remove the stock locally after deletion
+      setWatchlist(
+        watchlist.filter((stock) => stock.stock_symbol !== stock_symbol)
+      );
       alert(`Stock ${stock_symbol} removed from watchlist`);
     } catch (err: any) {
       console.error(
@@ -54,13 +56,31 @@ const Watchlist = () => {
   return (
     <div>
       <h3>Your Watchlist</h3>
+      <h4>Total Price: ${total.toFixed(2)}</h4>
       {watchlist.length === 0 ? (
         <p>No stocks in watchlist.</p>
       ) : (
         <ul>
           {watchlist.map((stock) => (
-            <li key={stock.id}>
-              {stock.stock_symbol}{" "}
+            <li
+              key={stock.id}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: "1rem",
+              }}
+            >
+              <div>
+                <p>
+                  <strong>{stock.stock_symbol}</strong>
+                </p>
+                <p>Added at: {new Date(stock.added_at).toLocaleString()}</p>
+                <p>
+                  Price at addition: $
+                  {parseFloat(stock.price_at_time).toFixed(2)}
+                </p>
+              </div>
               <button
                 onClick={() => handleRemoveFromWatchlist(stock.stock_symbol)}
               >

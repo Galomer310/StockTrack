@@ -1,3 +1,4 @@
+// Frontend/src/pages/StockSearch.tsx
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
@@ -12,9 +13,7 @@ const StockSearch: React.FC = () => {
   const [companyInfo, setCompanyInfo] = useState<any>(null);
   const [marketStatus, setMarketStatus] = useState<string | null>(null);
   const [error, setError] = useState("");
-
   const navigate = useNavigate();
-
   const user = useSelector((state: RootState) => state.auth.user);
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
 
@@ -36,7 +35,6 @@ const StockSearch: React.FC = () => {
         console.error("Error checking market status", err);
       }
     };
-
     checkMarketStatus();
   }, []);
 
@@ -44,19 +42,16 @@ const StockSearch: React.FC = () => {
   const searchStock = async () => {
     try {
       setError(""); // Reset errors
-
       // Fetch stock price (previous close)
       const stockRes = await axios.get(
         `https://api.polygon.io/v2/aggs/ticker/${query}/prev?adjusted=true&apiKey=${POLYGON_API_KEY}`
       );
-
       if (stockRes.data.results && stockRes.data.results.length > 0) {
         setStockData(stockRes.data.results[0]); // Get first result
       } else {
         setError("No stock data available.");
         setStockData(null);
       }
-
       // Fetch company details
       const companyRes = await axios.get(
         `https://api.polygon.io/v3/reference/tickers/${query}?apiKey=${POLYGON_API_KEY}`
@@ -69,7 +64,7 @@ const StockSearch: React.FC = () => {
     }
   };
 
-  // ✅ Add stock to watchlist
+  // ✅ Add stock to watchlist (only send stock_symbol)
   const addToWatchlist = async () => {
     if (!user) {
       setError("You must be logged in to add to watchlist");
@@ -78,7 +73,7 @@ const StockSearch: React.FC = () => {
     try {
       await axios.post(
         "http://localhost:3000/watchlist",
-        { stock_symbol: query, userId: user.id },
+        { stock_symbol: query }, // Removed userId from payload
         {
           headers: { Authorization: `Bearer ${accessToken}` },
         }
@@ -99,12 +94,9 @@ const StockSearch: React.FC = () => {
         onChange={(e) => setQuery(e.target.value.toUpperCase())}
       />
       <button onClick={searchStock}>Search</button>
-
       {/* Display Market Status Message */}
       {marketStatus && <p className="market-status">{marketStatus}</p>}
-
       {error && <p className="error">{error}</p>}
-
       {/* Display Company Info */}
       {companyInfo && (
         <div className="company-info">
@@ -115,12 +107,10 @@ const StockSearch: React.FC = () => {
               style={{ width: "100px", height: "100px", objectFit: "contain" }}
             />
           )}
-
           <h3>{companyInfo.name}</h3>
           <p>Industry: {companyInfo.sic_description}</p>
         </div>
       )}
-
       {/* Display Stock Data */}
       {stockData && (
         <div className="stock-info">
