@@ -37,21 +37,19 @@ const Watchlist = () => {
     fetchWatchlist();
   }, [user, navigate, accessToken]);
 
-  const handleRemoveFromWatchlist = async (stock_symbol: string) => {
+  const handleRemoveFromWatchlist = async (id: number) => {
     try {
-      await axios.delete(`http://localhost:3000/watchlist/${stock_symbol}`, {
+      await axios.delete(`http://localhost:3000/watchlist/${id}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
-      const updatedWatchlist = watchlist.filter(
-        (stock) => stock.stock_symbol !== stock_symbol
-      );
+      const updatedWatchlist = watchlist.filter((stock) => stock.id !== id);
       setWatchlist(updatedWatchlist);
-      // Recalculate total
+      // Recalculate the total if needed
       const newTotal = updatedWatchlist.reduce((sum, item) => {
         return sum + parseFloat(item.price_at_time) * Number(item.quantity);
       }, 0);
       setTotal(newTotal);
-      alert(`Stock ${stock_symbol} removed from watchlist`);
+      alert(`Watchlist item removed`);
     } catch (err: any) {
       console.error(
         "Error removing from watchlist:",
@@ -109,7 +107,7 @@ const Watchlist = () => {
   return (
     <div>
       <h3>Your Watchlist</h3>
-      <h4>Total Price: ${total.toFixed(2)}</h4>
+      <h4>Total Portfolio: ${total.toFixed(2)}</h4>
       {watchlist.length === 0 ? (
         <p>No stocks in watchlist.</p>
       ) : (
@@ -183,11 +181,7 @@ const Watchlist = () => {
                   </div>
                   <div>
                     <button onClick={() => handleEdit(stock)}>Edit</button>
-                    <button
-                      onClick={() =>
-                        handleRemoveFromWatchlist(stock.stock_symbol)
-                      }
-                    >
+                    <button onClick={() => handleRemoveFromWatchlist(stock.id)}>
                       Remove
                     </button>
                   </div>
