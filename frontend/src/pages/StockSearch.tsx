@@ -5,10 +5,11 @@ import axios from "axios";
 import { RootState } from "../store";
 import { useNavigate } from "react-router-dom";
 
-const POLYGON_API_KEY = import.meta.env.VITE_POLYGON_API_KEY; // Load API key from .env
+const POLYGON_API_KEY = import.meta.env.VITE_POLYGON_API_KEY;
 
 const StockSearch: React.FC = () => {
   const [query, setQuery] = useState("");
+  const [quantity, setQuantity] = useState(1); // New state for quantity
   const [stockData, setStockData] = useState<any>(null);
   const [companyInfo, setCompanyInfo] = useState<any>(null);
   const [marketStatus, setMarketStatus] = useState<string | null>(null);
@@ -17,7 +18,6 @@ const StockSearch: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
 
-  // ✅ Check if market is open when the component loads
   useEffect(() => {
     const checkMarketStatus = async () => {
       try {
@@ -38,21 +38,18 @@ const StockSearch: React.FC = () => {
     checkMarketStatus();
   }, []);
 
-  // ✅ Fetch stock data & company info
   const searchStock = async () => {
     try {
-      setError(""); // Reset errors
-      // Fetch stock price (previous close)
+      setError("");
       const stockRes = await axios.get(
         `https://api.polygon.io/v2/aggs/ticker/${query}/prev?adjusted=true&apiKey=${POLYGON_API_KEY}`
       );
       if (stockRes.data.results && stockRes.data.results.length > 0) {
-        setStockData(stockRes.data.results[0]); // Get first result
+        setStockData(stockRes.data.results[0]);
       } else {
         setError("No stock data available.");
         setStockData(null);
       }
-      // Fetch company details
       const companyRes = await axios.get(
         `https://api.polygon.io/v3/reference/tickers/${query}?apiKey=${POLYGON_API_KEY}`
       );
@@ -64,7 +61,7 @@ const StockSearch: React.FC = () => {
     }
   };
 
-  // ✅ Add stock to watchlist (only send stock_symbol)
+  // Now include quantity in the payload
   const addToWatchlist = async () => {
     if (!user) {
       setError("You must be logged in to add to watchlist");
@@ -73,12 +70,10 @@ const StockSearch: React.FC = () => {
     try {
       await axios.post(
         "http://localhost:3000/watchlist",
-        { stock_symbol: query }, // Removed userId from payload
-        {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        }
+        { stock_symbol: query, quantity }, // sending quantity along with symbol
+        { headers: { Authorization: `Bearer ${accessToken}` } }
       );
-      alert(`${query} added to watchlist`);
+      alert(`${query} added to watchlist with quantity ${quantity}`);
     } catch (err) {
       setError("Failed to add to watchlist");
     }
@@ -93,16 +88,21 @@ const StockSearch: React.FC = () => {
         value={query}
         onChange={(e) => setQuery(e.target.value.toUpperCase())}
       />
+      <input
+        type="number"
+        min="1"
+        placeholder="Quantity"
+        value={quantity}
+        onChange={(e) => setQuantity(Number(e.target.value))}
+      />
       <button onClick={searchStock}>Search</button>
-      {/* Display Market Status Message */}
       {marketStatus && <p className="market-status">{marketStatus}</p>}
       {error && <p className="error">{error}</p>}
-      {/* Display Company Info */}
       {companyInfo && (
         <div className="company-info">
           {companyInfo.branding?.logo_url && (
             <img
-              src={`${companyInfo.branding.logo_url}?format=png`} // Append ?format=png
+              src={`${companyInfo.branding.logo_url}?format=png`}
               alt={`${companyInfo.name} Logo`}
               style={{ width: "100px", height: "100px", objectFit: "contain" }}
             />
@@ -111,7 +111,6 @@ const StockSearch: React.FC = () => {
           <p>Industry: {companyInfo.sic_description}</p>
         </div>
       )}
-      {/* Display Stock Data */}
       {stockData && (
         <div className="stock-info">
           <h3>
