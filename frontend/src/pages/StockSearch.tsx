@@ -107,13 +107,7 @@ const StockSearch: React.FC = () => {
         value={query}
         onChange={(e) => setQuery(e.target.value.toUpperCase())}
       />
-      <input
-        type="number"
-        min="1"
-        placeholder="Quantity"
-        value={quantity}
-        onChange={(e) => setQuantity(Number(e.target.value))}
-      />
+
       <button onClick={searchStock}>Search</button>
       {marketStatus && <p className="market-status">{marketStatus}</p>}
       {error && <p className="error">{error}</p>}
@@ -178,6 +172,13 @@ const StockSearch: React.FC = () => {
           <button onClick={addToWatchlist} disabled={!user}>
             Add to Watchlist
           </button>
+          <input
+            type="number"
+            min="1"
+            placeholder="choose quantity"
+            value={quantity}
+            onChange={(e) => setQuantity(Number(e.target.value))}
+          />
         </div>
       )}
 
