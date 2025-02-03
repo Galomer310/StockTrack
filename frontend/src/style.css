@@ -463,3 +463,35 @@
     }
   }
   
+
+
+  /* Example styles for the portfolio performance table */
+.portfolio-performance {
+  margin: 20px auto;
+  max-width: 800px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.portfolio-performance h3 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.portfolio-performance table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.portfolio-performance th,
+.portfolio-performance td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+.portfolio-performance th {
+  background-color: #f1f3f4;
+}

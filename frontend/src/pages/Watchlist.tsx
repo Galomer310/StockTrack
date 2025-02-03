@@ -1,10 +1,10 @@
-// frontend/src/pages/Watchlist.tsx
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
 import { useNavigate } from "react-router-dom";
-import StockDistributionPieChart from "../components/StockDistributionPieChart"; // renamed pie chart component
+import StockDistributionPieChart from "../components/StockDistributionPieChart";
+import PortfolioPerformance from "../components/PortfolioPerformance";
 
 const Watchlist = () => {
   const [watchlist, setWatchlist] = useState<any[]>([]);
@@ -36,7 +36,6 @@ const Watchlist = () => {
     };
     fetchWatchlist();
   }, [user, navigate, accessToken]);
-
   const handleRemoveFromWatchlist = async (id: number) => {
     try {
       await axios.delete(`http://localhost:3000/watchlist/${id}`, {
@@ -107,13 +106,16 @@ const Watchlist = () => {
 
   return (
     <div>
-      <h4>Total Portfolio Contribution Value: ${total.toFixed(2)}</h4>
+      <h3>Your Watchlist</h3>
+      <h4>Total Portfolio Value: ${total.toFixed(2)}</h4>
 
       <StockDistributionPieChart watchlist={watchlist} />
 
+      {/* New Component for Profit/Loss */}
+      <PortfolioPerformance watchlist={watchlist} />
+
       {/* Watchlist Container */}
       <div className="watchlist">
-        {/* Data Rows */}
         {watchlist.map((stock) => (
           <div
             key={stock.id}
