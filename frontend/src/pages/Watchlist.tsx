@@ -1,9 +1,9 @@
-// Frontend/src/pages/Watchlist.tsx
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
 import { useNavigate } from "react-router-dom";
+import StockDistributionPieChart from "../components/StockDistributionPieChart";
 
 const Watchlist = () => {
   const [watchlist, setWatchlist] = useState<any[]>([]);
@@ -24,7 +24,6 @@ const Watchlist = () => {
         const response = await axios.get("http://localhost:3000/watchlist", {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
-        // Response: { total, watchlist }
         setWatchlist(response.data.watchlist);
         setTotal(response.data.total);
       } catch (err: any) {
@@ -44,7 +43,6 @@ const Watchlist = () => {
       });
       const updatedWatchlist = watchlist.filter((stock) => stock.id !== id);
       setWatchlist(updatedWatchlist);
-      // Recalculate the total if needed
       const newTotal = updatedWatchlist.reduce((sum, item) => {
         return sum + parseFloat(item.price_at_time) * Number(item.quantity);
       }, 0);
@@ -58,21 +56,17 @@ const Watchlist = () => {
     }
   };
 
-  // Toggle edit mode for a specific item
+  // Enter edit mode for a specific item
   const handleEdit = (item: any) => {
     setEditingItemId(item.id);
-    // Prepare data for editing. For the date, convert to a local datetime string.
+    // Initialize edit fields with the current data
     setEditingItemData({
       quantity: item.quantity,
       price_at_time: item.price_at_time,
-      // Format added_at for input[type="datetime-local"]
-      added_at: item.added_at
-        ? new Date(item.added_at).toISOString().slice(0, 16)
-        : "",
+      added_at: item.added_at,
     });
   };
 
-  // Handle changes in the edit form
   const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setEditingItemData((prev: any) => ({ ...prev, [name]: value }));
@@ -87,110 +81,107 @@ const Watchlist = () => {
           headers: { Authorization: `Bearer ${accessToken}` },
         }
       );
-      // Update the local watchlist state
+      // Update local state with the edited data
       const updatedWatchlist = watchlist.map((item) =>
         item.id === id ? { ...item, ...editingItemData } : item
       );
       setWatchlist(updatedWatchlist);
-      // Recalculate total
       const newTotal = updatedWatchlist.reduce((sum, item) => {
         return sum + parseFloat(item.price_at_time) * Number(item.quantity);
       }, 0);
       setTotal(newTotal);
       setEditingItemId(null);
       setEditingItemData({});
-    } catch (err) {
-      console.error("Error updating watchlist item", err);
+      alert("Watchlist item updated");
+    } catch (err: any) {
+      console.error(
+        "Error updating watchlist item:",
+        err.response?.data || err.message
+      );
     }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingItemId(null);
+    setEditingItemData({});
   };
 
   return (
     <div>
       <h3>Your Watchlist</h3>
-      <h4>Total Portfolio: ${total.toFixed(2)}</h4>
-      {watchlist.length === 0 ? (
-        <p>No stocks in watchlist.</p>
-      ) : (
-        <ul>
-          {watchlist.map((stock) => (
-            <li
-              key={stock.id}
-              style={{
-                borderBottom: "1px solid #ccc",
-                marginBottom: "1rem",
-                paddingBottom: "1rem",
-              }}
-            >
+      <h4>Total Portfolio Value: ${total.toFixed(2)}</h4>
+
+      <StockDistributionPieChart watchlist={watchlist} />
+
+      {/* Watchlist Container */}
+      <div className="watchlist">
+        {/* Header Row */}
+        <div className="watchlist-header">
+          <div className="ticker">Ticker</div>
+          <div className="price">Price</div>
+          <div className="quantity">Qty</div>
+          <div className="added">Added</div>
+          <div className="actions">Actions</div>
+        </div>
+
+        {/* Data Rows */}
+        {watchlist.map((stock) => (
+          <div
+            key={stock.id}
+            className={`watchlist-row ${
+              editingItemId === stock.id ? "editing" : ""
+            }`}
+          >
+            <div className="ticker">{stock.stock_symbol}</div>
+            <div className="price">
+              ${parseFloat(stock.price_at_time).toFixed(2)}
+            </div>
+            <div className="quantity">
               {editingItemId === stock.id ? (
-                // Edit mode: show inputs for quantity, price, and date
-                <div>
-                  <label>
-                    Quantity:
-                    <input
-                      type="number"
-                      name="quantity"
-                      value={editingItemData.quantity}
-                      onChange={handleEditChange}
-                      min="1"
-                    />
-                  </label>
-                  <br />
-                  <label>
-                    Price:
-                    <input
-                      type="number"
-                      name="price_at_time"
-                      value={editingItemData.price_at_time}
-                      onChange={handleEditChange}
-                      step="0.01"
-                    />
-                  </label>
-                  <br />
-                  <label>
-                    Added Date:
-                    <input
-                      type="datetime-local"
-                      name="added_at"
-                      value={editingItemData.added_at}
-                      onChange={handleEditChange}
-                    />
-                  </label>
-                  <br />
-                  <button onClick={() => handleSaveEdit(stock.id)}>Save</button>
-                  <button onClick={() => setEditingItemId(null)}>Cancel</button>
-                </div>
+                <input
+                  type="number"
+                  name="quantity"
+                  value={editingItemData.quantity}
+                  onChange={handleEditChange}
+                  min="1"
+                />
               ) : (
-                // Display mode: show item details
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <div>
-                    <p>
-                      <strong>{stock.stock_symbol}</strong>
-                    </p>
-                    <p>Added at: {new Date(stock.added_at).toLocaleString()}</p>
-                    <p>
-                      Price at addition: $
-                      {parseFloat(stock.price_at_time).toFixed(2)}
-                    </p>
-                    <p>Quantity: {stock.quantity}</p>
-                  </div>
-                  <div>
-                    <button onClick={() => handleEdit(stock)}>Edit</button>
-                    <button onClick={() => handleRemoveFromWatchlist(stock.id)}>
-                      Remove
-                    </button>
-                  </div>
-                </div>
+                stock.quantity
               )}
-            </li>
-          ))}
-        </ul>
-      )}
+            </div>
+            <div className="added">
+              {editingItemId === stock.id ? (
+                <input
+                  type="datetime-local"
+                  name="added_at"
+                  value={new Date(editingItemData.added_at)
+                    .toISOString()
+                    .slice(0, 16)}
+                  onChange={handleEditChange}
+                />
+              ) : (
+                new Date(stock.added_at).toLocaleString()
+              )}
+            </div>
+            <div className="actions">
+              {editingItemId === stock.id ? (
+                <>
+                  <button onClick={() => handleSaveEdit(stock.id)}>Save</button>
+                  <button onClick={handleCancelEdit}>Cancel</button>
+                </>
+              ) : (
+                <>
+                  <button onClick={() => handleEdit(stock)}>Edit</button>
+                  <button onClick={() => handleRemoveFromWatchlist(stock.id)}>
+                    Remove
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
       <button onClick={() => navigate("/")}>Log Out</button>
       <button onClick={() => navigate("/search")}>Search Stocks</button>
     </div>
